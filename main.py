@@ -23,6 +23,25 @@ PA_rect = PA.get_rect(center = (350,490))
 IW = Game_Font.render("Invalid Guess", True, "White")
 IW_rect = IW.get_rect(center = (330,490))
 Invaild_Word = False
+
+class Keys:
+    def __init__(self, pos_x, pos_y, letter):
+        self.rect = pygame.Rect(pos_x, pos_y, 30, 30)
+        self.Text = letter
+        self.Text_Type = pygame.font.Font(None, 36)
+        self.Display_Text = self.Text_Type.render(self.Text, True, "Black")
+        x,y = self.rect.center
+        self.Display_Text_rect = self.Display_Text.get_rect(center = (x,y))
+        self.Color = "White"
+
+    def Draw(self):
+        pygame.draw.rect(SCREEN, self.Color, self.rect)
+        SCREEN.blit(self.Display_Text,self.Display_Text_rect)
+    
+    def Update(self, color):
+        self.Color = color
+        self.Draw()
+
 class Boxes:
     def __init__(self, pos_x, pos_y, Tag_num):
         self.rect = pygame.Rect(pos_x, pos_y, 64, 64)
@@ -103,6 +122,45 @@ def Check(letter,Word, part_of_word):
     else: return "Gray"
 Rows = [B11,B12,B13,B14,B15,B21,B22,B23,B24,B25,B31,B32,B33,B34,B35,B41,B42,B43,B44,B45,B51,B52,B53,B54,B55,B61,B62,B63,B64,B65]
 Checker = ""
+
+# First row of keys
+AKEY = Keys(0, 460, "A")
+BKEY = Keys(40, 460, "B")
+CKEY = Keys(80, 460, "C")
+DKEY = Keys(120, 460, "D")
+EKEY = Keys(160, 460, "E")
+FKEY = Keys(200, 460, "F")
+GKEY = Keys(240, 460, "G")
+HKEY = Keys(280, 460, "H")
+IKEY = Keys(320, 460, "I")
+JKEY = Keys(360, 460, "J")
+KKEY = Keys(400, 460, "K")
+LKEY = Keys(440, 460, "L")
+MKEY = Keys(480, 460, "M")
+
+NKEY = Keys(0, 490, "N")
+OKEY = Keys(40, 490, "O")
+PKEY = Keys(80, 490, "P")
+QKEY = Keys(120, 490, "Q")
+RKEY = Keys(160, 490, "R")
+SKEY = Keys(200, 490, "S")
+TKEY = Keys(240, 490, "T")
+UKEY = Keys(280, 490, "U")
+VKEY = Keys(320, 490, "V")
+WKEY = Keys(360, 490, "W")
+XKEY = Keys(400, 490, "X")
+YKEY = Keys(440, 490, "Y")
+ZKEY = Keys(480, 490, "Z")
+
+Keys_List = [AKEY,BKEY,CKEY,DKEY,EKEY,FKEY,GKEY,HKEY,IKEY,JKEY,KKEY,LKEY,MKEY,NKEY,OKEY,PKEY,QKEY,RKEY,SKEY,TKEY,UKEY,VKEY,WKEY,XKEY,YKEY,ZKEY]
+
+def find_key(letter):
+    for index,key in enumerate(Keys_List):
+        if key.Text == letter:
+            return index
+    return None
+
+
 while True:
   count = 0
   for e in pygame.event.get():
@@ -110,15 +168,15 @@ while True:
           pygame.quit()
           sys.exit()
       if Running:
-          for index,col in enumerate(Rows):
-              if col.Text == "":
-                  if index - 1 in (4,9,14,19,24,29) and not Rows[index - 1].Entered:
-                      Rows[index - 1].Typing = True
-                  else:
-                      col.Typing = True
-                      Rows[index - 1].Typing = False
-                  break
-          if e.type == pygame.KEYDOWN:
+        for index,col in enumerate(Rows):
+            if col.Text == "":
+                if index - 1 in (4,9,14,19,24,29) and not Rows[index - 1].Entered:
+                    Rows[index - 1].Typing = True
+                else:
+                    col.Typing = True
+                    Rows[index - 1].Typing = False
+                break
+        if e.type == pygame.KEYDOWN:
             for Index,box in enumerate(Rows):
                 if box.Typing:
                     if e.key == pygame.K_BACKSPACE:
@@ -137,6 +195,8 @@ while True:
                             for b in range(5):
                                 Rows[Index - b].Entered = True
                                 Rows[Index - b].GuessColor = Check(Rows[Index - b].Text,WORD,4 - b)
+                                keyindex = find_key(Rows[Index - b].Text)
+                                Keys_List[keyindex].Update(Rows[Index - b].GuessColor)
                                 if Rows[Index - b].GuessColor == "Green":
                                     count += 1
                                     if count == 5:
@@ -163,6 +223,7 @@ while True:
                     else:
                         if len(box.Text) < 1 and e.unicode in string.ascii_letters:
                             box.Text += e.unicode.upper()
+    
       else:
           if e.type == pygame.KEYDOWN:
               if e.key == pygame.K_SPACE:
@@ -175,28 +236,32 @@ while True:
                   WORD = random.choice(WORDCHOICES).upper()
                   Running = True
   if Running:
-      SCREEN.fill("Black")
-      SCREEN.blit(Title, Title_rect)
-      if Invaild_Word: SCREEN.blit(IW, IW_rect)
-      B11.Draw();B12.Draw();B13.Draw();B14.Draw();B15.Draw()
-      B21.Draw();B22.Draw();B23.Draw();B24.Draw();B25.Draw()
-      B31.Draw();B32.Draw();B33.Draw();B34.Draw();B35.Draw()
-      B41.Draw();B42.Draw();B43.Draw();B44.Draw();B45.Draw()
-      B51.Draw();B52.Draw();B53.Draw();B54.Draw();B55.Draw()
-      B61.Draw();B62.Draw();B63.Draw();B64.Draw();B65.Draw()
+    SCREEN.fill("Black")
+    SCREEN.blit(Title, Title_rect)
+    if Invaild_Word: SCREEN.blit(IW, IW_rect)
+    B11.Draw();B12.Draw();B13.Draw();B14.Draw();B15.Draw()
+    B21.Draw();B22.Draw();B23.Draw();B24.Draw();B25.Draw()
+    B31.Draw();B32.Draw();B33.Draw();B34.Draw();B35.Draw()
+    B41.Draw();B42.Draw();B43.Draw();B44.Draw();B45.Draw()
+    B51.Draw();B52.Draw();B53.Draw();B54.Draw();B55.Draw()
+    B61.Draw();B62.Draw();B63.Draw();B64.Draw();B65.Draw()
+    for key in Keys_List:
+        key.Draw()
   else:
-      SCREEN.fill("Black")
-      Result_Text = Game_Font.render(str(Result), True, "White")
-      Final_Text = Game_Font.render(f"The Correct word was {WORD}", True, "White")
-      SCREEN.blit(Title, Title_rect)
-      SCREEN.blit(Result_Text, Result_rect)
-      SCREEN.blit(Final_Text,Final_rect)
-      SCREEN.blit(PA,PA_rect)
-      B11.Draw();B12.Draw();B13.Draw();B14.Draw();B15.Draw()
-      B21.Draw();B22.Draw();B23.Draw();B24.Draw();B25.Draw()
-      B31.Draw();B32.Draw();B33.Draw();B34.Draw();B35.Draw()
-      B41.Draw();B42.Draw();B43.Draw();B44.Draw();B45.Draw()
-      B51.Draw();B52.Draw();B53.Draw();B54.Draw();B55.Draw()
-      B61.Draw();B62.Draw();B63.Draw();B64.Draw();B65.Draw()
+    SCREEN.fill("Black")
+    Result_Text = Game_Font.render(str(Result), True, "White")
+    Final_Text = Game_Font.render(f"The Correct word was {WORD}", True, "White")
+    SCREEN.blit(Title, Title_rect)
+    SCREEN.blit(Result_Text, Result_rect)
+    SCREEN.blit(Final_Text,Final_rect)
+    SCREEN.blit(PA,PA_rect)
+    B11.Draw();B12.Draw();B13.Draw();B14.Draw();B15.Draw()
+    B21.Draw();B22.Draw();B23.Draw();B24.Draw();B25.Draw()
+    B31.Draw();B32.Draw();B33.Draw();B34.Draw();B35.Draw()
+    B41.Draw();B42.Draw();B43.Draw();B44.Draw();B45.Draw()
+    B51.Draw();B52.Draw();B53.Draw();B54.Draw();B55.Draw()
+    B61.Draw();B62.Draw();B63.Draw();B64.Draw();B65.Draw()
+    for key in Keys_List:
+        key.Update("White")
   Clock.tick(60)
   pygame.display.update()
